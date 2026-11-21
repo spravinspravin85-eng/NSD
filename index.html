@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#050811" />
+  <title>NSD — NITRO STORM DRIFT</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <header id="top-bar" class="glass-panel">
+    <div class="brand">
+      <span class="brand-badge">V12</span>
+      <h1>NSD — NITRO STORM DRIFT</h1>
+    </div>
+    <div class="player-stats">
+      <div class="stat-pill">LVL <span id="ui-level">1</span> (<span id="ui-xp">0</span> XP)</div>
+      <div class="stat-pill credit-pill">CR <span id="ui-credits">50,000</span></div>
+      <button id="btn-audio-toggle" class="icon-btn" title="Toggle Audio">🔊</button>
+      <button id="btn-pause" class="icon-btn hidden" title="Pause">❚❚</button>
+    </div>
+  </header>
+
+  <main id="garage-screen" class="screen-overlay">
+    <div class="garage-top-nav glass-panel">
+      <button class="tab-btn active" data-tab="cars">GARAGE (200)</button>
+      <button class="tab-btn" data-tab="customize">CUSTOMIZE</button>
+      <button class="tab-btn" data-tab="upgrades">UPGRADES</button>
+      <button class="tab-btn" data-tab="modes">RACE MODES</button>
+      <button class="tab-btn" data-tab="career">CAREER</button>
+    </div>
+
+    <div id="garage-drawer" class="garage-left glass-panel">
+      <div id="tab-cars" class="tab-content active">
+        <select id="car-category-filter">
+          <option value="ALL">All Categories (200 Vehicles)</option>
+          <option value="Supercar">Supercars (20)</option>
+          <option value="Hypercar">Hypercars (20)</option>
+          <option value="Sports">Sports Cars (20)</option>
+          <option value="Muscle">Muscle Cars (20)</option>
+          <option value="Drift">Drift Spec (20)</option>
+          <option value="Sedan">Luxury Sedans (20)</option>
+          <option value="SUV">Performance SUVs (20)</option>
+          <option value="Offroad">Off-Road (20)</option>
+          <option value="Electric">Electric / Hyper-EV (20)</option>
+          <option value="Race">GT / Track Race (20)</option>
+        </select>
+        <div id="car-list" class="scroll-list"></div>
+      </div>
+
+      <div id="tab-customize" class="tab-content">
+        <h4>Metallic Body Paint</h4>
+        <div id="paint-swatches" class="swatch-grid"></div>
+        <h4>Turntable & Underglow Neon</h4>
+        <div id="neon-swatches" class="swatch-grid"></div>
+        <div class="control-group">
+          <label>Hood Vent & Body Kit</label>
+          <select id="custom-hood">
+            <option value="0">Stock Sculpted Hood</option>
+            <option value="1">Carbon Twin-Vent Hood</option>
+            <option value="2">GT Supercharger Cowl</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Rear Spoiler Wing</label>
+          <select id="custom-spoiler">
+            <option value="0">Stock Aero Lip</option>
+            <option value="1">Street Carbon Wing</option>
+            <option value="2">GT Track Swan-Neck</option>
+            <option value="3">Time-Attack Mega Wing</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Deep-Dish Alloy Rims</label>
+          <select id="custom-rims">
+            <option value="0">Chrome Deep-Dish Mesh</option>
+            <option value="1">Championship Gold Forged</option>
+            <option value="2">Electric Cyan Aero</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="tab-upgrades" class="tab-content">
+        <div id="upgrade-list" class="scroll-list"></div>
+      </div>
+
+      <div id="tab-modes" class="tab-content">
+        <div class="control-group">
+          <label>Select Event Mode (12 Modes)</label>
+          <select id="select-race-mode">
+            <option value="circuit">1. Night City Circuit (3 Laps)</option>
+            <option value="freeroam">10. Open-World Free Roam</option>
+            <option value="sprint">2. Harbor-to-Skyline City Sprint</option>
+            <option value="highway">3. Coastal Wangan Highway Battle</option>
+            <option value="timetrial">4. Solo Time Trial Attack</option>
+            <option value="drift">5. Mountain Touge Drift Competition</option>
+            <option value="checkpoint">6. Airport Checkpoint Rush</option>
+            <option value="knockout">7. Elimination Knockout Race</option>
+            <option value="drag">8. 1/2 Mile Airport Drag Strip</option>
+            <option value="speedtrap">9. Highway Speed Trap Challenge</option>
+            <option value="championship">11. NSD Apex Championship Cup</option>
+            <option value="special">12. Midnight Storm Special Event</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>AI Rival Difficulty</label>
+          <select id="select-difficulty">
+            <option value="0.82">Rookie</option>
+            <option value="0.95" selected>Pro Street</option>
+            <option value="1.08">Apex Master</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Weather & Time of Day</label>
+          <select id="select-weather">
+            <option value="night_wet" selected>Night City Wet Asphalt (Bloom)</option>
+            <option value="storm">Thunderstorm & Heavy Rain</option>
+            <option value="sunset">Cyber Sunset</option>
+            <option value="day">Clear Daylight</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Graphics Quality</label>
+          <select id="select-graphics">
+            <option value="low">Mobile Performance (60 FPS)</option>
+            <option value="high" selected>Ultra Neon Bloom + Reflections</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Transmission</label>
+          <select id="select-transmission">
+            <option value="auto" selected>Automatic</option>
+            <option value="manual">Manual (Q / E Shift)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="tab-career" class="tab-content">
+        <div id="career-stats-box" class="info-box"></div>
+        <h4>Career Missions & Rewards</h4>
+        <div id="mission-list" class="scroll-list"></div>
+        <button id="btn-reset-save" class="danger-btn">Reset Save Data</button>
+      </div>
+    </div>
+
+    <div class="garage-bottom-left glass-panel">
+      <div class="car-title-row">
+        <span id="spec-class" class="badge-cyan">SUPERCAR</span>
+        <h3 id="spec-name">Ferrari 488 Pista</h3>
+      </div>
+      <div class="stat-bars">
+        <div class="bar-row"><span>TOP SPEED</span><div class="bar-bg"><div id="bar-speed" class="bar-fill"></div></div></div>
+        <div class="bar-row"><span>ACCELERATION</span><div class="bar-bg"><div id="bar-accel" class="bar-fill"></div></div></div>
+        <div class="bar-row"><span>HANDLING</span><div class="bar-bg"><div id="bar-handling" class="bar-fill"></div></div></div>
+        <div class="bar-row"><span>NITRO</span><div class="bar-bg"><div id="bar-nitro" class="bar-fill"></div></div></div>
+      </div>
+    </div>
+
+    <div class="garage-right-stack">
+      <div class="part-menu glass-panel">
+        <button class="part-btn active" data-quick="cars">CAR</button>
+        <button class="part-btn" data-quick="hood">HOOD</button>
+        <button class="part-btn" data-quick="spoiler">SPOILER</button>
+        <button class="part-btn" data-quick="wheels">WHEELS</button>
+      </div>
+      <div class="launch-panel glass-panel">
+        <button id="btn-buy-car" class="primary-btn hidden">UNLOCK CAR — CR 25,000</button>
+        <button id="btn-start-race" class="primary-btn">START RACE ▶</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="race-hud" class="hidden">
+    <div class="hud-top-left">
+      <div class="hud-box glass-panel">
+        <small>LAP</small>
+        <strong id="hud-lap-num">1/3</strong>
+      </div>
+      <div class="hud-box glass-panel">
+        <small>POS</small>
+        <strong><span id="hud-pos">1</span><span id="hud-total-cars">/6</span></strong>
+      </div>
+      <div class="hud-box glass-panel" style="min-width:120px;">
+        <small id="hud-mode-label">CIRCUIT</small>
+        <strong id="hud-lap">0.0s</strong>
+      </div>
+    </div>
+
+    <div class="hud-center-banner">
+      <div id="hud-countdown" class="countdown-text hidden">3</div>
+      <div id="hud-drift-box" class="drift-popup hidden">
+        <span id="hud-drift-score">SLIDING / DRIFT +150</span>
+      </div>
+      <div id="hud-district" class="district-sub">DOWNTOWN NEON DISTRICT</div>
+    </div>
+
+    <div class="hud-bottom-left">
+      <canvas id="minimap-canvas" width="160" height="160"></canvas>
+      <div class="hud-quick-btns">
+        <button id="btn-cam-cycle" class="mini-btn">CAM [C]</button>
+        <button id="btn-reset-car" class="mini-btn">RESET [R]</button>
+        <button id="btn-headlights" class="mini-btn">LIGHTS [L]</button>
+      </div>
+    </div>
+
+    <div class="hud-bottom-right">
+      <canvas id="tacho-canvas" width="220" height="220"></canvas>
+      <div class="dash-indicators glass-panel">
+        <span class="ind on">ABS</span>
+        <span class="ind on">TCS</span>
+        <span id="ind-nos" class="ind">NOS</span>
+        <span id="ind-temp" class="ind on">92°C</span>
+        <span id="ind-odo">0.0 km</span>
+      </div>
+    </div>
+
+    <div id="touch-controls">
+      <div class="touch-left">
+        <button id="touch-left" class="touch-pad">◀</button>
+        <button id="touch-right" class="touch-pad">▶</button>
+      </div>
+      <div class="touch-right">
+        <button id="touch-nitro" class="touch-btn nitro-btn">NITRO</button>
+        <button id="touch-handbrake" class="touch-btn drift-btn">DRIFT</button>
+        <button id="touch-brake" class="touch-btn brake-btn">BRAKE</button>
+        <button id="touch-gas" class="touch-btn gas-btn">GAS</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-backdrop hidden">
+    <div class="modal-card glass-panel">
+      <h2 id="modal-title">RACE COMPLETE</h2>
+      <div id="modal-body"></div>
+      <div class="modal-actions">
+        <button id="btn-modal-resume" class="primary-btn">RESUME</button>
+        <button id="btn-modal-garage" class="secondary-btn" style="flex:1">RETURN TO GARAGE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

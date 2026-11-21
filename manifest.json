@@ -1,0 +1,10 @@
+{
+  "name": "NSD — NITRO STORM DRIFT",
+  "short_name": "NSD Drift",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#050811",
+  "theme_color": "#050811",
+  "description": "3D Open-World Arcade & Drift Racing Game powered by Three.js WebGL"
+}
